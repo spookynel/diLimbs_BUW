@@ -1,0 +1,216 @@
+{
+    "nodes": [
+        {
+            "name": "RightHand",
+            "children": [
+                {
+                    "nodes": [
+                        {
+                            "name": "RightFinger1Metacarpal",
+                            "children": [
+                                {
+                                    "nodes": [
+                                        {
+                                            "name": "RightFinger1Proximal",
+                                            "children": [
+                                                {
+                                                    "nodes": [
+                                                        {
+                                                            "name": "RightFinger1Distal",
+                                                            "children": [
+                                                                {
+                                                                    "nodes": [
+                                                                        {
+                                                                            "name": "RightFinger1Tip",
+                                                                            "children": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "nodes": [
+                        {
+                            "name": "RightFinger2Metacarpal",
+                            "children": [
+                                {
+                                    "nodes": [
+                                        {
+                                            "name": "RightFinger2Proximal",
+                                            "children": [
+                                                {
+                                                    "nodes": [
+                                                        {
+                                                            "name": "RightFinger2Medial",
+                                                            "children": [
+                                                                {
+                                                                    "nodes": [
+                                                                        {
+                                                                            "name": "RightFinger2Distal",
+                                                                            "children": [
+                                                                                {
+                                                                                    "nodes": [
+                                                                                        {
+                                                                                            "name": "RightFinger2Tip"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "nodes": [
+                        {
+                            "name": "RightFinger3Metacarpal",
+                            "children": [
+                                {
+                                    "nodes": [
+                                        {
+                                            "name": "RightFinger3Proximal",
+                                            "children": [
+                                                {
+                                                    "nodes": [
+                                                        {
+                                                            "name": "RightFinger3Medial",
+                                                            "children": [
+                                                                {
+                                                                    "nodes": [
+                                                                        {
+                                                                            "name": "RightFinger3Distal",
+                                                                            "children": [
+                                                                                {
+                                                                                    "nodes": [
+                                                                                        {
+                                                                                            "name": "RightFinger3Tip"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "nodes": [
+                        {
+                            "name": "RightFinger4Metacarpal",
+                            "children": [
+                                {
+                                    "nodes": [
+                                        {
+                                            "name": "RightFinger4Proximal",
+                                            "children": [
+                                                {
+                                                    "nodes": [
+                                                        {
+                                                            "name": "RightFinger4Medial",
+                                                            "children": [
+                                                                {
+                                                                    "nodes": [
+                                                                        {
+                                                                            "name": "RightFinger4Distal",
+                                                                            "children": [
+                                                                                {
+                                                                                    "nodes": [
+                                                                                        {
+                                                                                            "name": "RightFinger4Tip"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "nodes": [
+                        {
+                            "name": "RightFinger5Metacarpal",
+                            "children": [
+                                {
+                                    "nodes": [
+                                        {
+                                            "name": "RightFinger5Proximal",
+                                            "children": [
+                                                {
+                                                    "nodes": [
+                                                        {
+                                                            "name": "RightFinger5Medial",
+                                                            "children": [
+                                                                {
+                                                                    "nodes": [
+                                                                        {
+                                                                            "name": "RightFinger5Distal",
+                                                                            "children": [
+                                                                                {
+                                                                                    "nodes": [
+                                                                                        {
+                                                                                            "name": "RightFinger5Tip"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

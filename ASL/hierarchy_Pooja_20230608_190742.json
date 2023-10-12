@@ -1,0 +1,47 @@
+{
+  "RightHand": {
+    "RightFinger1Metacarpal": {
+      "RightFinger1Proximal": {
+        "RightFinger1Distal": {
+          "RightFinger1Tip": {}
+        }
+      }
+    },
+    "RightFinger2Metacarpal": {
+      "RightFinger2Proximal": {
+        "RightFinger2Medial": {
+          "RightFinger2Distal": {
+            "RightFinger2Tip": {}
+          }
+        }
+      }
+    },
+    "RightFinger3Metacarpal": {
+      "RightFinger3Proximal": {
+        "RightFinger3Medial": {
+          "RightFinger3Distal": {
+            "RightFinger3Tip": {}
+          }
+        }
+      }
+    },
+    "RightFinger4Metacarpal": {
+      "RightFinger4Proximal": {
+        "RightFinger4Medial": {
+          "RightFinger4Distal": {
+            "RightFinger4Tip": {}
+          }
+        }
+      }
+    },
+    "RightFinger5Metacarpal": {
+      "RightFinger5Proximal": {
+        "RightFinger5Medial": {
+          "RightFinger5Distal": {
+            "RightFinger5Tip": {}
+          }
+        }
+      }
+    }
+  }
+}
