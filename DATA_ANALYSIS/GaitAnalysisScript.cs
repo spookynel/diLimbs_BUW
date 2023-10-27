@@ -3,14 +3,20 @@ using UnityEngine;
 using System.IO;
 using System.Globalization;
 
-public class GaitAnalysisScript : MonoBehaviour
+public class GaitAnalysisScript : MonoBehaviour //TODO: Change directory to save the csv files.
 {
-    private List<float> strideLengths = new List<float>();
+    string nameObj;
+    string participant;
+
+    private List<float> strideLengthsRight = new List<float>();
+    private List<float> strideTimesRight = new List<float>();
+    private List<float> strideLengthsLeft = new List<float>();
+    private List<float> strideTimesLeft = new List<float>();
     private List<float> strideWidths = new List<float>();
     private List<float> stepLengths = new List<float>();
-    private List<float> legLengths = new List<float>();
-    private List<float> strideTimes = new List<float>();
+    private List<float> legLengths = new List<float>();   
     private List<float> velocitys = new List<float>();
+    private List<float> accelerations = new List<float>();
 
     private float legLength;
     private float startTime;
@@ -28,28 +34,16 @@ public class GaitAnalysisScript : MonoBehaviour
     private Transform rightShoulder;
     private Transform leftShoulder;
     private Transform head;
-
-    private Vector3 prevRightFootPosition;
-    //private float prevTimestamp;
-
-    //private float maxVelocity;
-    //private float maxAcceleration;
-    private float prevVelocity;
+  
     private float acceleration;
 
     private bool firstFrame = true;
 
-    //private bool rightFootGrounded = true;
-    //private bool leftFootGrounded = true;
     private List<int> rightFootGroundedStates = new List<int>();
     private List<int> leftFootGroundedStates = new List<int>();
 
-    private Vector3 rightFootGroundedPosition; // Stores the position of the right foot when it first touches the ground
-    private bool rightFootWasGrounded; // Keeps track of whether the right foot was grounded in the previous frame
-
-    private List<Vector3> rightFootPositions = new List<Vector3>(); // List to store the positions of the right foot
-
-    private List<Quaternion> rightFootRotations = new List<Quaternion>(); // List to store the rotations of the right foot---
+    // Lists to store joint rotations 
+    private List<Quaternion> rightFootRotations = new List<Quaternion>(); 
     private List<Quaternion> rightThighRotations = new List<Quaternion>();
     private List<Quaternion> leftThighRotations = new List<Quaternion>();
     private List<Quaternion> righthShinRotations = new List<Quaternion>();
@@ -60,58 +54,79 @@ public class GaitAnalysisScript : MonoBehaviour
 
     private bool prevRightFootGround;
     private Vector3 rightFootPrevPos;
-    private float strideLength;
-    private float startStrideTime;
-    private float strideTime;
+    private float strideRightLength;
+    private float startStrideRightTime;
+    private float strideRightTime;
+
+    private bool prevLeftFootGround;
+    private Vector3 leftFootPrevPos;
+    private float strideLeftLength;
+    private float startStrideLeftTime;
+    private float strideLeftTime;
 
     private Rigidbody hipsRigidbody; // Add a Rigidbody reference for the "hips" node
     private Vector3 prevHipsPosition;
+    private Vector3 prevHipsVelocity;
     private float hipsVelocityMagnitude; // Store the magnitude of the hips velocity
+    private float hipsAccelerationMagnitude; // Store the magnitude of the hips acceleration
+
 
 
 
     void Start()
     {
+        //Get the name of the game object
+        nameObj = gameObject.name;
+        if (transform.childCount > 0)
+        {
+            participant = transform.GetChild(0).name;
+        }
+
         // Define the output file name based on the game object's name
         outputFileName = "D:/Usuarios/kerke/Escritorio/DiLimbs/DATA_ANALYSIS/csv_files/" + name + ".csv";
+        
 
         // Record the start time for timestamping
         startTime = Time.time;
-        startStrideTime = Time.time;
-        strideTime = 0.0f;
 
+        //Initialize times for right strides
+        startStrideRightTime = Time.time;
+        startStrideLeftTime = Time.time;
+        strideRightTime = 0.0f;
+        strideLeftTime = 0.0f;
+
+        //Initialize times for left strides
         prevRightFootGround = false;
-        strideLength = 0.0f;
-
-        // Ensure both feet are grounded at the start
-        //rightFootGrounded = true;
-        //leftFootGrounded = true;
-
-        // Find the right leg transforms
-        rightFoot = transform.Find("P09/Root/Hips/RightThigh/RightShin/RightFoot");
-        leftFoot = transform.Find("P09/Root/Hips/LeftThigh/LeftShin/LeftFoot");
-        rightThigh = transform.Find("P09/Root/Hips/RightThigh");
-        leftThigh = transform.Find("P09/Root/Hips/LeftThigh");
-        rightShin = transform.Find("P09/Root/Hips/RightThigh/RightShin");
-        leftShin = transform.Find("P09/Root/Hips/LeftThigh/LeftShin");
-        rightShoulder = transform.Find("P09/Root/Hips/Spine1/Spine2/Spine3/Spine4/RightShoulder");
-        leftShoulder = transform.Find("P09/Root/Hips/Spine1/Spine2/Spine3/Spine4/LeftShoulder");
-        head = transform.Find("P09/Root/Hips/Spine1/Spine2/Spine3/Spine4/Neck/Head");
-        hips = transform.Find("P09/Root/Hips");
+        prevLeftFootGround = false;
+        strideRightLength = 0.0f;
+        strideLeftLength = 0.0f;
 
 
-        if (rightFoot != null && rightThigh != null)
+        // Find the limbs transforms
+        rightFoot = transform.Find(participant+ "/Root/Hips/RightThigh/RightShin/RightFoot");
+        leftFoot = transform.Find(participant + "/Root/Hips/LeftThigh/LeftShin/LeftFoot");
+        rightThigh = transform.Find(participant + "/Root/Hips/RightThigh");
+        leftThigh = transform.Find(participant + "/Root/Hips/LeftThigh");
+        rightShin = transform.Find(participant + "/Root/Hips/RightThigh/RightShin");
+        leftShin = transform.Find(participant + "/Root/Hips/LeftThigh/LeftShin");
+        rightShoulder = transform.Find(participant + "/Root/Hips/Spine1/Spine2/Spine3/Spine4/RightShoulder");
+        leftShoulder = transform.Find(participant + "/Root/Hips/Spine1/Spine2/Spine3/Spine4/LeftShoulder");
+        head = transform.Find(participant + "/Root/Hips/Spine1/Spine2/Spine3/Spine4/Neck/Head");
+        hips = transform.Find(participant + "/Root/Hips");
+
+        // Find the leg length
+        if (rightFoot != null && rightThigh != null && leftFoot != null)
         {
             legLength = Vector3.Distance(rightThigh.position, rightFoot.position);
             rightFootPrevPos = rightFoot.position;
+            leftFootPrevPos = leftFoot.position;
         }
         else
         {
-            Debug.LogError("Could not find RightFoot or RightThigh node.");
+            Debug.LogError("Could not find RightFoot or RightThigh or LeftFoot node.");
         }
 
-        // Find hips transform for velocity and acceleration       
-
+        // Find hips transform for velocity and acceleration     
         if (hips == null)
         {
             Debug.LogError("Could not find Hips node.");
@@ -123,20 +138,18 @@ public class GaitAnalysisScript : MonoBehaviour
 
             if (hipsRigidbody == null)
             {
-                Debug.LogError("Rigidbody component not found on the Hips node.");
+                Debug.LogError("Rigidbody component not found on the Hips node."); // Add a Rigidbody component to the Hips node in the Unity Editor!
             }
 
             prevHipsPosition = new Vector3(hips.position.x, 0.0f, hips.position.z); // Store the initial position on the horizontal plane
+            prevHipsVelocity = Vector3.zero; // Store the initial velocity
         }
-
-        // Find toe tip transforms for raycasting
-        //rightToeTip = transform.Find("P09/Root/Hips/RightThigh/RightShin/RightFoot/RightToe/RightToeTip");
-        //leftToeTip = transform.Find("P09/Root/Hips/LeftThigh/LeftShin/LeftFoot/LeftToe/LeftToeTip");
-
+       
     }
 
     void Update()
     {
+        // Check if all the limb transforms have been found
         if (leftFoot != null && rightFoot != null && rightThigh != null && leftThigh != null && rightShin != null && leftShin != null && rightShoulder != null && leftShoulder != null && head != null)
         {
 
@@ -150,7 +163,7 @@ public class GaitAnalysisScript : MonoBehaviour
             rightFootGroundedStates.Add(isRightFootGrounded ? 1 : 0);
             leftFootGroundedStates.Add(isLeftFootGrounded ? 1 : 0);
 
-            // Store the current rotation of the right foot at each frame---
+            // Store the current rotation of the joints at each frame
             rightFootRotations.Add(rightFoot.rotation);
             rightThighRotations.Add(rightThigh.rotation);
             leftThighRotations.Add(leftThigh.rotation);
@@ -159,18 +172,6 @@ public class GaitAnalysisScript : MonoBehaviour
             rightShoulderRotations.Add(rightShoulder.rotation);
             leftShoulderRotations.Add(leftShoulder.rotation);
             headRotations.Add(head.rotation);
-
-
-            // Calculate stride length
-            //float strideLength = Vector3.Distance(rightFoot.position, leftFoot.position);
-            //strideLengths.Add(strideLength);
-            //float currentStrideLength = Vector3.Distance(rightFoot.position, rightFootGroundedPosition);
-
-            // Calculate stride time
-            //float timestamp = Time.time - startTime;
-            //float strideTime = firstFrame ? 0 : timestamp - prevTimestamp;
-            //strideTimes.Add(strideTime);
-            //prevTimestamp = timestamp;
 
             // Calculate step length
             float stepLength = Vector3.Distance(rightFoot.position, leftFoot.position);
@@ -187,58 +188,62 @@ public class GaitAnalysisScript : MonoBehaviour
             if (firstFrame)
             {
                 prevRightFootGround = isRightFootGrounded ? true : false;
+                prevLeftFootGround = isLeftFootGrounded ? true : false;
                 rightFootPrevPos = rightFoot.position;
-                strideTime = 0.0f;
-                strideLength = 0.0f;
+                leftFootPrevPos = leftFoot.position;
+                strideRightTime = 0.0f;
+                strideLeftTime = 0.0f;
+                strideRightLength = 0.0f;
+                strideLeftLength = 0.0f;
             }
-
             
             if (!firstFrame)
             {
-                // Calculate velocity and acceleration
-                /*float velocity = strideLength / strideTime;
-                acceleration = (velocity - prevVelocity) / strideTime;
-                if (acceleration > maxAcceleration)
-                {
-                    maxAcceleration = acceleration;
-                }
-
-                if (velocity > maxVelocity)
-                {
-                    maxVelocity = velocity;
-                }
-                */
-
-                //Calculate stride length
+                //Calculate right stride length
                 if (!prevRightFootGround && isRightFootGrounded) //Right foot was in the air and is now grounded
                 {
-                    strideLength = Vector3.Distance(rightFoot.position, rightFootPrevPos);
+                    strideRightLength = Vector3.Distance(rightFoot.position, rightFootPrevPos);
                     prevRightFootGround = true;
-                    strideTime = Time.time - startStrideTime;
-                    //Debug.Log("0 1");
+                    strideRightTime = Time.time - startStrideRightTime;
                 }
                 if (prevRightFootGround && !isRightFootGrounded) //Right foot was grounded and is now in the air
                 {
                     rightFootPrevPos = rightFoot.position;
-                    //strideLength = Vector3.Distance(rightFoot.position, rightFootPrevPos);
                     prevRightFootGround = false;
-                    startStrideTime = Time.time;
-                    //Debug.Log("1 0");
+                    startStrideRightTime = Time.time;
                 }
                 if (prevRightFootGround && isRightFootGrounded) //Right foot was grounded and is still grounded
                 {
-                    //rightFootPrevPos = rightFoot.position;
                     prevRightFootGround = true;
-                    //Debug.Log("1 1");
                 }
                 if (!prevRightFootGround && !isRightFootGrounded) //Right foot was in the air and is still in the air
                 {
-                    //strideLength = Vector3.Distance(rightFoot.position, rightFootPrevPos);
                     prevRightFootGround = false;
-                    //Debug.Log("0 0");
                 }
 
-                
+                //Calculate left stride length
+                if (!prevLeftFootGround && isLeftFootGrounded) //Left foot was in the air and is now grounded
+                {
+                    strideLeftLength = Vector3.Distance(leftFoot.position, leftFootPrevPos);
+                    prevLeftFootGround = true;
+                    strideLeftTime = Time.time - startStrideLeftTime;
+                }
+                if (prevLeftFootGround && !isLeftFootGrounded) //Left foot was grounded and is now in the air
+                {
+                    leftFootPrevPos = leftFoot.position;
+                    prevLeftFootGround = false;
+                    startStrideLeftTime = Time.time;
+                }
+                if (prevLeftFootGround && isLeftFootGrounded) //Left foot was grounded and is still grounded
+                {
+                    prevLeftFootGround = true;
+                }
+                if (!prevLeftFootGround && !isLeftFootGrounded) //Left foot was in the air and is still in the air
+                {
+                    prevLeftFootGround = false;
+                }
+
+
             }
 
             if (hipsRigidbody != null)
@@ -248,19 +253,32 @@ public class GaitAnalysisScript : MonoBehaviour
                 Vector3 hipsVelocity = (currentHipsPosition - prevHipsPosition) / Time.deltaTime;
 
                 // Store the magnitude of the hips velocity
-                hipsVelocityMagnitude = hipsVelocity.magnitude;
+                hipsVelocityMagnitude = hipsVelocity.magnitude;                
 
-                // Store the previous position for the next frame
+                // Calculate acceleration
+                Vector3 hipsAcceleration = (hipsVelocity - prevHipsVelocity) / Time.deltaTime;
+
+                // Store the magnitude of the hips acceleration
+                hipsAccelerationMagnitude = hipsAcceleration.magnitude;
+
+                // Store the previous position and velocity for the next frame
                 prevHipsPosition = currentHipsPosition;
+                prevHipsVelocity = hipsVelocity;
 
             }
+            // Add the stride lengths to the lists
+            strideLengthsRight.Add(strideRightLength);
+            strideLengthsLeft.Add(strideLeftLength);
 
-            prevVelocity = strideLength / strideTime;
-            firstFrame = false;
-            //rightFootPositions.Add(rightFoot.position); // Store the current position of the right foot at each frame
-            strideLengths.Add(strideLength);
-            strideTimes.Add(strideTime);
+            // Add the stride times to the lists
+            strideTimesRight.Add(strideRightTime);
+            strideTimesLeft.Add(strideLeftTime);
+
+            // Add the velocity and acceleration to the lists
             velocitys.Add(hipsVelocityMagnitude);
+            accelerations.Add(hipsAccelerationMagnitude);
+
+            firstFrame = false;
         }
     }
 
@@ -282,13 +300,12 @@ public class GaitAnalysisScript : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        int minCount = Mathf.Min(strideLengths.Count, rightFootGroundedStates.Count);
+        int minCount = Mathf.Min(strideLengthsRight.Count, rightFootGroundedStates.Count);
 
         using (StreamWriter writer = new StreamWriter(outputFileName))
         {
-            writer.WriteLine("Timestamp,LegLength,StrideLength,StrideTime,StepLength,StrideWidth,StrideLengthRatio,StrideWidthRatio,StepLengthRatio,Velocity,RightFootGround,LeftFootGround," +
-                /*"MaxVelocity,Acceleration,MaxAcceleration,VelocityRatio,AccelerationRatio," +*/
-                /*"RightFootGround,LeftFootGround,RightFootX,RightFootY,RightFootZ," +*/
+            writer.WriteLine("Timestamp,LegLength,StepLength,StepLengthRatio,StrideWidth,StrideWidthRatio,StrideLengthRight,StrideLengthRightRatio,StrideTimeRight,StrideLengthLeft,StrideLengthLeftRatio,StrideTimeLeft," +
+                "Velocity,VelocityRatio,Acceleration,AccelerationRatio,RightFootGround,LeftFootGround," +
                 "RightThighRotationX,RightThighRotationY,RightThighRotationZ,RightThighRotationW," +
                 "LeftThighRotationX,LeftThighRotationY,LeftThighRotationZ,LeftThighRotationW," +
                 "RightShinRotationX,RightShinRotationY,RightShinRotationZ,RightShinRotationW," +
@@ -302,7 +319,6 @@ public class GaitAnalysisScript : MonoBehaviour
             for (int i = 0; i < minCount; i++)
             {
                 float timestamp = i * (1.0f / 30.0f);
-                Vector3 rightFootPosition = i < rightFootPositions.Count ? rightFootPositions[i] : Vector3.zero;
                 Quaternion rightFootRotation = i < rightFootRotations.Count ? rightFootRotations[i] : Quaternion.identity;
                 Quaternion rightThighRotation = i < rightThighRotations.Count ? rightThighRotations[i] : Quaternion.identity;
                 Quaternion leftThighRotation = i < leftThighRotations.Count ? leftThighRotations[i] : Quaternion.identity;
@@ -312,11 +328,9 @@ public class GaitAnalysisScript : MonoBehaviour
                 Quaternion leftShoulderRotation = i < leftShoulderRotations.Count ? leftShoulderRotations[i] : Quaternion.identity;
                 Quaternion headRotation = i < headRotations.Count ? headRotations[i] : Quaternion.identity;
 
-                writer.WriteLine($"{timestamp.ToString("F6", culture)},{legLengths[i].ToString("F6", culture)},{strideLengths[i].ToString("F6", culture)},{strideTimes[i].ToString("F6", culture)},{stepLengths[i].ToString("F6", culture)},{strideWidths[i].ToString("F6", culture)},{(strideLengths[i] / legLengths[i]).ToString("F6", culture)},{(strideWidths[i] / legLengths[i]).ToString("F6", culture)},{(stepLengths[i] / legLengths[i]).ToString("F6", culture)}," +
-                    $"{velocitys[i].ToString("F6", culture)}," +
-                    /*$"{maxVelocity.ToString("F6", culture)},{acceleration.ToString("F6", culture)},{maxAcceleration.ToString("F6", culture)},{(maxVelocity / legLengths[i]).ToString("F6", culture)},{(maxAcceleration / legLengths[i]).ToString("F6", culture)}," +*/
+                writer.WriteLine($"{timestamp.ToString("F6", culture)},{legLengths[i].ToString("F6", culture)},{stepLengths[i].ToString("F6", culture)},{(stepLengths[i] / legLengths[i]).ToString("F6", culture)},{strideWidths[i].ToString("F6", culture)},{(strideWidths[i] / legLengths[i]).ToString("F6", culture)},{strideLengthsRight[i].ToString("F6", culture)},{(strideLengthsRight[i] / legLengths[i]).ToString("F6", culture)},{strideTimesRight[i].ToString("F6", culture)},{strideLengthsLeft[i].ToString("F6", culture)},{(strideLengthsLeft[i] / legLengths[i]).ToString("F6", culture)},{strideTimesLeft[i].ToString("F6", culture)}," +
+                    $"{velocitys[i].ToString("F6", culture)},{(velocitys[i] / legLengths[i]).ToString("F6", culture)},{accelerations[i].ToString("F6", culture)},{(accelerations[i] / legLengths[i]).ToString("F6", culture)}," +
                     $"{rightFootGroundedStates[i]},{leftFootGroundedStates[i]}," +
-                    /*$"{rightFootPosition.x.ToString("F6", culture)},{rightFootPosition.y.ToString("F6", culture)},{rightFootPosition.z.ToString("F6", culture)}," +*/
                     $"{rightThighRotation.x.ToString("F6", culture)},{rightThighRotation.y.ToString("F6", culture)},{rightThighRotation.z.ToString("F6", culture)},{rightThighRotation.w.ToString("F6", culture)}," +
                     $"{leftThighRotation.x.ToString("F6", culture)},{leftThighRotation.y.ToString("F6", culture)},{leftThighRotation.z.ToString("F6", culture)},{leftThighRotation.w.ToString("F6", culture)}," +
                     $"{rightShinRotation.x.ToString("F6", culture)},{rightShinRotation.y.ToString("F6", culture)},{rightShinRotation.z.ToString("F6", culture)},{rightShinRotation.w.ToString("F6", culture)}," +
